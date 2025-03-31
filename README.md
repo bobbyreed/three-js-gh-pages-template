@@ -1,1 +1,2 @@
 # virtual-fairgrounds-web
+This repo will be used to teach software engineering practices to undergraduate students enrolled in a Introduction to Software Engineering course at [Oklahoma City University](www.okcu.edu).
