@@ -10,12 +10,19 @@ start.addEventListener("click", function() { startAnimation(entryAnimation); });
 const stop = document.getElementById("stop");
 stop.addEventListener("click", function() { stopAnimation(); });
 const yRight = document.getElementById("yR");
-yRight.addEventListener("click", function() { moveCamera(1); });
+yRight.addEventListener("click", function() { moveObject(.1); });
+const yLeft = document.getElementById("yL");
+yLeft.addEventListener("click", function() { moveObject(-.1)});
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 const renderer = new THREE.WebGLRenderer();
+
+//unused now but need for interactivity
 const controls = new OrbitControls(camera, renderer.domElement);
+
+//unused now but need for bringing in gltfs
 const loader = new GLTFLoader();
+
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
@@ -45,11 +52,11 @@ function startAnimation(animation){
   renderer.setAnimationLoop( animation )
 }
 
-function moveCamera(move) {
+function moveObject(move) {
   canAnimate = false;
   cube.rotation.y += move;
   renderer.render( scene, camera );
-  renderer.setAnimationLoop( moveCamera );
+  startAnimation(animation);
 }
 
 
