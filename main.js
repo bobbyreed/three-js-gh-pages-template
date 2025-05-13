@@ -5,6 +5,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+const yRight = document.getElementById("yR");
+yRight.addEventListener("click", function() { moveCamera(1); });
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 const renderer = new THREE.WebGLRenderer();
@@ -27,6 +29,9 @@ function animate() {
   }
   renderer.setAnimationLoop( animate );
 
+function moveCamera(move) {
+  controls.camera.position.y += move;
+}
 
 
 
