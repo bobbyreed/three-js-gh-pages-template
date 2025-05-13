@@ -1,5 +1,6 @@
 //core lirbaries
 import * as THREE from 'three';
+import React from 'react';
 
 // Import addons (using the mapping from above)
 //import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
