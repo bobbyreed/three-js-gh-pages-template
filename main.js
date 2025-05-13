@@ -39,9 +39,13 @@ function stopAnimation(){
   renderer.setAnimationLoop( canAnimate = false )
 }
 
+function startAnimation(){
+  renderer.setAnimationLoop( canAnimate = true )
+}
+
 function moveCamera(move) {
   canAnimate = false;
-  controls.camera.position.y += move;
+  cube.rotation.y += move;
   renderer.render( scene, camera );
   renderer.setAnimationLoop( moveCamera );
 }
