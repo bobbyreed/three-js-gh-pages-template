@@ -5,6 +5,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+const start = document.getElementById("start");
+start.addEventListener("click", function() { startAnimation(entryAnimation); });
 const stop = document.getElementById("stop");
 stop.addEventListener("click", function() { stopAnimation(); });
 const yRight = document.getElementById("yR");
@@ -39,8 +41,8 @@ function stopAnimation(){
   renderer.setAnimationLoop( canAnimate = false )
 }
 
-function startAnimation(){
-  renderer.setAnimationLoop( canAnimate = true )
+function startAnimation(animation){
+  renderer.setAnimationLoop( animation )
 }
 
 function moveCamera(move) {
