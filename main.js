@@ -1,9 +1,11 @@
 //core lirbaries
 import * as THREE from 'three';
+import React from 'react';
 
 // Import addons (using the mapping from above)
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { useState } from 'react';
 
 const start = document.getElementById("start");
 start.addEventListener("click", function() { startAnimation(entryAnimation); });
@@ -63,8 +65,8 @@ primitives[20] = new THREE.WireframeGeometry( 1, 1, 1);
 const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 material.transparent(true);
 material.opacity = 0.5;
-const cube = new THREE.Mesh( geometry, material );
-scene.add( cube );
+const [primitive, setPrimitive] = useState(new THREE.Mesh( geometry, material ));
+scene.add( primitive );
 
 camera.position.z = 5;
 
@@ -72,8 +74,8 @@ var canAnimate = true;
 function entryAnimation() {
   canAnimate = true;
   if(canAnimate){
-    primitives[currentObject].rotation.x += 0.01;
-    primitives[currentObject].rotation.y += 0.01;
+    primitive.rotation.x += 0.01;
+    primitive.rotation.y += 0.01;
     renderer.render( scene, camera );
   }
     
@@ -97,6 +99,7 @@ function moveObject(move) {
 
 function switchObject(){
   currentObject ++;
+  setPrimitive()
   startAnimation(entryAnimation);
 }
 
