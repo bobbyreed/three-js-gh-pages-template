@@ -3,8 +3,8 @@ import * as THREE from 'three';
 import React from 'react';
 
 // Import addons (using the mapping from above)
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+//import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+//import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { useState } from 'react';
 
 const start = document.getElementById("start");
@@ -16,7 +16,7 @@ yRight.addEventListener("click", function() { moveObject(.1); });
 const yLeft = document.getElementById("yL");
 yLeft.addEventListener("click", function() { moveObject(-.1)});
 const switchObject = document.getElementById("object");
-switchObject.addEventListener("click", function() { switchObject() });
+switchObject.addEventListener("click", function() { nextObject() });
 const moreTransparent = document.getElementById("moreO");
 stop.addEventListener("click", function() { Opacity(-.1) });
 const lessTransparent = document.getElementById("lessO");
@@ -29,10 +29,10 @@ const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.inner
 const renderer = new THREE.WebGLRenderer();
 
 //unused now but need for interactivity
-const controls = new OrbitControls(camera, renderer.domElement);
+  //const controls = new OrbitControls(camera, renderer.domElement);
 
 //unused now but need for bringing in gltfs
-const loader = new GLTFLoader();
+  //const loader = new GLTFLoader();
 
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
@@ -97,7 +97,7 @@ function moveObject(move) {
   renderer.setAnimationLoop( moveCamera );
 }
 
-function switchObject(){
+function nextObject(){
   currentObject ++;
   setPrimitive()
   startAnimation(entryAnimation);
