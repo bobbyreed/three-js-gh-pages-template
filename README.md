@@ -16,12 +16,14 @@ This template uses CDNs exclusively with ES modules and import maps for dependen
 - **Smaller repository size** - No node_modules directory or package files
 
 The template loads these libraries via CDN:
-```html
-<!-- Three.js and its addons -->
+Three.js and its addons
+```
+Three.js and its addons
 "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
 "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-
-<!-- React libraries -->
+```
+```
+React libraries
 "react": "https://unpkg.com/react@18/umd/react.production.min.js"
 "react-dom": "https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
 ```
