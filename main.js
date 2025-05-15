@@ -45,6 +45,8 @@ function initScene() {
   // Create camera
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.z = 5;
+  camera.position.y = -1; // Move camera down to make object appear higher
+  camera.lookAt(0, 0, 0); // Keep looking at the center
   
   // Create renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -188,7 +190,24 @@ function changeObject(index) {
 function setupEventListeners() {
   // Debug which elements are found
   console.log("Setting up event listeners");
-  
+  const scaleSlider = document.getElementById('scale-slider');
+const scaleValue = document.getElementById('scale-value');
+
+if (scaleSlider && scaleValue) {
+  scaleSlider.addEventListener('input', function() {
+    const value = parseFloat(this.value);
+    scaleValue.textContent = value.toFixed(1);
+    
+    // Update the 3D object
+    currentObject.scale.set(value, value, value);
+    
+    // Render to show changes if not animating
+    if (!isAnimating) {
+      renderer.render(scene, camera);
+    }
+  });
+  console.log("Scale slider listener attached");
+}
   // Basic animation controls
   const startButton = document.getElementById('start-animation');
   if (startButton) {
