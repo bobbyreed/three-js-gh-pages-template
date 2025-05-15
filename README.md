@@ -104,8 +104,3 @@ React libraries
 4. Deploy your changes
 
 No build steps or package installations required!
-
-## Projects using this template
-
-### Virtual Fairgrounds
-[Virtual Fairgrounds Web](https://github.com/DEVlimited/virtual-fairgrounds-web) is a VR and browser based recreation of the 1950's fairground neighborhood of Oklahoma City.
