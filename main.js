@@ -190,8 +190,55 @@ function changeObject(index) {
 function setupEventListeners() {
   // Debug which elements are found
   console.log("Setting up event listeners");
+  
+//slider setu p
   const scaleSlider = document.getElementById('scale-slider');
 const scaleValue = document.getElementById('scale-value');
+
+// Material type selection
+const materialType = document.getElementById('material-type');
+if (materialType) {
+  materialType.addEventListener('change', (e) => changeMaterial(e.target.value));
+  console.log("Material type listener attached");
+} else {
+  console.log("Material type element not found");
+}
+
+// Color picker
+const colorPicker = document.getElementById('color-picker');
+if (colorPicker) {
+  colorPicker.addEventListener('change', (e) => changeColor(e.target.value));
+  console.log("Color picker listener attached");
+} else {
+  console.log("Color picker not found");
+}
+
+// Random color button
+const randomizeColorBtn = document.getElementById('randomize-color');
+if (randomizeColorBtn) {
+  randomizeColorBtn.addEventListener('click', randomizeColor);
+  console.log("Randomize color button listener attached");
+} else {
+  console.log("Randomize color button not found");
+}
+
+// Wireframe toggle
+const wireframeToggle = document.getElementById('wireframe-toggle');
+if (wireframeToggle) {
+  wireframeToggle.addEventListener('change', (e) => setWireframe(e.target.checked));
+  console.log("Wireframe toggle listener attached");
+} else {
+  console.log("Wireframe toggle not found");
+}
+
+// Opacity slider
+const opacitySlider = document.getElementById('opacity-slider');
+if (opacitySlider) {
+  opacitySlider.addEventListener('input', (e) => setOpacity(parseFloat(e.target.value)));
+  console.log("Opacity slider listener attached");
+} else {
+  console.log("Opacity slider not found");
+}
 
 if (scaleSlider && scaleValue) {
   scaleSlider.addEventListener('input', function() {
@@ -248,4 +295,129 @@ if (scaleSlider && scaleValue) {
   buttons.forEach((btn, i) => {
     console.log(`Button ${i}: id='${btn.id}', text='${btn.textContent}'`);
   });
+}
+
+// Add these functions after the existing functions
+
+function changeMaterial(materialType) {
+  console.log(`Changing material to ${materialType}`);
+  
+  // Save current color and opacity
+  const currentColor = currentMaterial.color.getHex();
+  const currentOpacity = currentMaterial.opacity;
+  const currentWireframe = currentMaterial.wireframe || false;
+  
+  // Create new material based on type
+  switch (materialType) {
+    case 'basic':
+      currentMaterial = new THREE.MeshBasicMaterial({
+        color: currentColor,
+        transparent: true,
+        opacity: currentOpacity,
+        wireframe: currentWireframe
+      });
+      break;
+    case 'phong':
+      currentMaterial = new THREE.MeshPhongMaterial({
+        color: currentColor,
+        transparent: true,
+        opacity: currentOpacity,
+        wireframe: currentWireframe,
+        shininess: 30
+      });
+      break;
+    case 'standard':
+      currentMaterial = new THREE.MeshStandardMaterial({
+        color: currentColor,
+        transparent: true,
+        opacity: currentOpacity,
+        wireframe: currentWireframe,
+        metalness: 0.2,
+        roughness: 0.8
+      });
+      break;
+    case 'lambert':
+      currentMaterial = new THREE.MeshLambertMaterial({
+        color: currentColor,
+        transparent: true,
+        opacity: currentOpacity,
+        wireframe: currentWireframe
+      });
+      break;
+    case 'toon':
+      currentMaterial = new THREE.MeshToonMaterial({
+        color: currentColor,
+        transparent: true,
+        opacity: currentOpacity,
+        wireframe: currentWireframe
+      });
+      break;
+  }
+  
+  // Apply to current object
+  if (currentObject) {
+    currentObject.material = currentMaterial;
+    
+    // Render to show changes if not animating
+    if (!isAnimating) {
+      renderer.render(scene, camera);
+    }
+  }
+}
+
+function changeColor(color) {
+  console.log(`Changing color to ${color}`);
+  if (currentMaterial) {
+    currentMaterial.color.set(color);
+    
+    // Render to show changes if not animating
+    if (!isAnimating) {
+      renderer.render(scene, camera);
+    }
+  }
+}
+
+function setWireframe(enabled) {
+  console.log(`Setting wireframe to ${enabled}`);
+  if (currentMaterial) {
+    currentMaterial.wireframe = enabled;
+    
+    // Render to show changes if not animating
+    if (!isAnimating) {
+      renderer.render(scene, camera);
+    }
+  }
+}
+
+function randomizeColor() {
+  const randomColor = Math.floor(Math.random() * 0xffffff);
+  const hexColor = '#' + randomColor.toString(16).padStart(6, '0');
+  console.log(`Randomizing color to ${hexColor}`);
+  
+  // Update color picker element to show the new color
+  const colorPicker = document.getElementById('color-picker');
+  if (colorPicker) {
+    colorPicker.value = hexColor;
+  }
+  
+  // Apply the color to the material
+  changeColor(randomColor);
+}
+
+function setOpacity(value) {
+  console.log(`Setting opacity to ${value}`);
+  if (currentMaterial) {
+    currentMaterial.opacity = value;
+    
+    // Update the display value
+    const opacityValue = document.getElementById('opacity-value');
+    if (opacityValue) {
+      opacityValue.textContent = value.toFixed(1);
+    }
+    
+    // Render to show changes if not animating
+    if (!isAnimating) {
+      renderer.render(scene, camera);
+    }
+  }
 }

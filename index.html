@@ -28,7 +28,15 @@
         }
       }
     </script>
-    
+    <div id="tech-panel" class="corner-panel top-left">
+  <div class="panel-content">
+    <h3>System Info</h3>
+    <div id="fps-counter">FPS: <span>60</span></div>
+    <div id="vertices-counter">Vertices: <span>0</span></div>
+    <div id="memory-usage">Memory: <span>0 MB</span></div>
+    <div id="rendered-objects">Objects: <span>1</span></div>
+  </div>
+</div>
     <!-- Main viewport and info overlay -->
     <div id="viewport"></div>
     <div id="performance-stats"></div>
@@ -37,7 +45,42 @@
       <h1>Three.js Interactive Showcase</h1>
       <div id="object-info">Current Object: <span id="current-object-name">Cube</span></div>
     </div>
-    
+    <!-- Top left corner panel - Technical Information -->
+<div id="tech-panel" class="corner-panel top-left">
+  <div class="panel-content">
+    <h3>System Info</h3>
+    <div id="fps-counter">FPS: <span>60</span></div>
+    <div id="vertices-counter">Vertices: <span>0</span></div>
+    <div id="memory-usage">Memory: <span>0 MB</span></div>
+    <div id="rendered-objects">Objects: <span>1</span></div>
+  </div>
+</div>
+
+<!-- Top right corner panel - Scene Presets -->
+<div id="scene-panel" class="corner-panel top-right">
+  <div class="panel-content">
+    <h3>Environment</h3>
+    <button id="preset-space" class="scene-btn">Deep Space</button>
+    <button id="preset-planet" class="scene-btn">Alien Planet</button>
+    <button id="preset-tech" class="scene-btn">Tech Lab</button>
+    <div class="slider-control">
+      <label for="ambient-slider">Ambient Light</label>
+      <input type="range" id="ambient-slider" min="0" max="1" step="0.1" value="0.5">
+    </div>
+  </div>
+</div>
+    <div id="scene-panel" class="corner-panel top-right">
+  <div class="panel-content">
+    <h3>Environment</h3>
+    <button id="preset-space" class="scene-btn">Deep Space</button>
+    <button id="preset-planet" class="scene-btn">Alien Planet</button>
+    <button id="preset-tech" class="scene-btn">Tech Lab</button>
+    <div class="slider-control">
+      <label for="ambient-slider">Ambient Light</label>
+      <input type="range" id="ambient-slider" min="0" max="1" step="0.1" value="0.5">
+    </div>
+  </div>
+</div>
     <!-- Console UI Container - Will be styled as U-shaped in CSS -->
     <div id="console-ui">
       <!-- Left Wing of Console -->
