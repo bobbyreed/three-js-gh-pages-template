@@ -2,45 +2,173 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Three.js Template</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Interactive Showcase</title>
     <link rel="stylesheet" href="./styles.css">
     <style>
-      body { margin: 0; }
+      body { margin: 0; overflow: hidden; }
     </style>
   </head>
   <body>
+    <!-- Import maps for modules -->
     <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
-                "babel-standalone":"https://unpkg.com/babel-standalone@6/babel.min.js"
-                
-            }
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+          "babel-standalone": "https://unpkg.com/babel-standalone@6/babel.min.js"
         }
+      }
     </script>
     <script crossorigin type="importmap">
-        {
-          "imports":{
-                  "react":"https://esm.sh/react@19.1.0",
-                  "react-dom":"https://esm.sh/react-dom@19.1.0"
-          }
+      {
+        "imports": {
+          "react": "https://unpkg.com/react@18/umd/react.production.min.js",
+          "react-dom": "https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
         }
-</script>
-    <script type="module" src="./main.js"></script>
-    <div id="info">
-      Test Text
-      <div id="locomotion">
-        <button id="start">Start Animation</button>
-        <button id="yL">Horizontal <-</button>
-        <button id="yR">Horizontal -></button>
-        <button id="stop">Stop Animation</button>
-        <button id="object">Change Object</button>
-        <button id="oMore">Transparency +</button>
-        <button id="oLess">Transparency -</button>  
-        <button id="color">Switch Color</button>
+      }
+    </script>
+    
+    <!-- Main viewport and info overlay -->
+    <div id="viewport"></div>
+    <div id="performance-stats"></div>
+    
+    <div id="info-panel">
+      <h1>Three.js Interactive Showcase</h1>
+      <div id="object-info">Current Object: <span id="current-object-name">Cube</span></div>
+    </div>
+    
+    <!-- Console UI Container - Will be styled as U-shaped in CSS -->
+    <div id="console-ui">
+      <!-- Left Wing of Console -->
+      <div id="left-console" class="console-section">
+        <div class="control-group">
+          <h3>Object Selection</h3>
+          <button id="prev-object" class="console-btn">Previous</button>
+          <button id="next-object" class="console-btn">Next</button>
+          <select id="object-select" class="console-select">
+            <option value="0">Cube</option>
+            <option value="1">Sphere</option>
+            <option value="2">Cylinder</option>
+            <!-- Add all 20 primitives options here -->
+          </select>
+        </div>
+        
+        <div class="control-group">
+          <h3>Object Properties</h3>
+          <div class="slider-control">
+            <label for="scale-slider">Scale</label>
+            <input type="range" id="scale-slider" min="0.1" max="3" step="0.1" value="1">
+            <span id="scale-value">1.0</span>
+          </div>
+          <div class="slider-control">
+            <label for="opacity-slider">Opacity</label>
+            <input type="range" id="opacity-slider" min="0" max="1" step="0.1" value="0.5">
+            <span id="opacity-value">0.5</span>
+          </div>
+          <div class="checkbox-control">
+            <input type="checkbox" id="wireframe-toggle">
+            <label for="wireframe-toggle">Wireframe</label>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <h3>Material</h3>
+          <select id="material-type" class="console-select">
+            <option value="basic">Basic</option>
+            <option value="phong">Phong</option>
+            <option value="standard">Standard</option>
+            <option value="lambert">Lambert</option>
+            <option value="toon">Toon</option>
+          </select>
+          <button id="randomize-color" class="console-btn">Random Color</button>
+          <input type="color" id="color-picker" value="#00ff00">
+        </div>
+      </div>
+      
+      <!-- Center Bottom Console -->
+      <div id="center-console" class="console-section">
+        <div class="control-group">
+          <h3>Animation Controls</h3>
+          <button id="start-animation" class="console-btn primary">Start</button>
+          <button id="stop-animation" class="console-btn primary">Stop</button>
+          <button id="reset-position" class="console-btn">Reset</button>
+        </div>
+        
+        <div class="control-group">
+          <h3>Environment</h3>
+          <button id="toggle-grid" class="console-btn">Toggle Grid</button>
+          <button id="toggle-axis-helper" class="console-btn">Toggle Axes</button>
+          <select id="background-select" class="console-select">
+            <option value="solid">Solid Color</option>
+            <option value="gradient">Gradient</option>
+            <option value="skybox">Skybox</option>
+          </select>
+        </div>
+        
+        <div class="control-group">
+          <h3>Effects</h3>
+          <button id="toggle-bloom" class="console-btn">Bloom</button>
+          <button id="toggle-dof" class="console-btn">Depth of Field</button>
+          <button id="screenshot" class="console-btn special">Take Screenshot</button>
+        </div>
+      </div>
+      
+      <!-- Right Wing of Console -->
+      <div id="right-console" class="console-section">
+        <div class="control-group">
+          <h3>Camera Controls</h3>
+          <div class="slider-control">
+            <label for="zoom-slider">Zoom</label>
+            <input type="range" id="zoom-slider" min="1" max="20" step="0.5" value="5">
+            <span id="zoom-value">5.0</span>
+          </div>
+          <div class="button-grid">
+            <button id="camera-top" class="console-btn">Top</button>
+            <button id="camera-front" class="console-btn">Front</button>
+            <button id="camera-left" class="console-btn">Left</button>
+            <button id="camera-right" class="console-btn">Right</button>
+            <button id="camera-orbit" class="console-btn">Orbit</button>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <h3>Lighting</h3>
+          <select id="light-type" class="console-select">
+            <option value="ambient">Ambient</option>
+            <option value="directional">Directional</option>
+            <option value="point">Point</option>
+            <option value="spot">Spot</option>
+          </select>
+          <div class="slider-control">
+            <label for="light-intensity">Intensity</label>
+            <input type="range" id="light-intensity" min="0" max="2" step="0.1" value="1">
+            <span id="intensity-value">1.0</span>
+          </div>
+          <button id="toggle-shadows" class="console-btn">Toggle Shadows</button>
+        </div>
+        
+        <div class="control-group">
+          <h3>Advanced</h3>
+          <button id="toggle-physics" class="console-btn">Physics</button>
+          <button id="add-particles" class="console-btn">Add Particles</button>
+          <button id="load-model" class="console-btn special">Load Model</button>
+        </div>
       </div>
     </div>
-    <div id="links"></div>
+    
+    <!-- Hidden file input for model loading -->
+    <input type="file" id="model-input" style="display: none;" accept=".glb,.gltf,.obj">
+    
+    <!-- Modal for any popup content -->
+    <div id="modal" class="hidden">
+      <div id="modal-content">
+        <span id="modal-close">&times;</span>
+        <div id="modal-body"></div>
+      </div>
+    </div>
+    
+    <!-- Load main script -->
+    <script type="module" src="./main.js"></script>
   </body>
 </html>

@@ -8,7 +8,7 @@
     color:aliceblue;
 }
 
-#locomotion {
+#buttons {
     display: grid;
     grid-template-columns: repeat(4, 5fr);
     gap: 10px;
