@@ -1,25 +1,94 @@
-#info {
-    position: absolute;
-    top: 10px;
-    width: 100%;
-    text-align: center;
-    z-index: 100;
-    display: block;
-    color:aliceblue;
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: white;
 }
 
-#buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 5fr);
-    gap: 10px;
-    padding: 10px;
-    height: auto;
-    width: 280px;
-    background-color: #2e2e2e;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    font-size: 24px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+#viewport {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+#info-panel {
+  position: absolute;
+  top: 10px;
+  width: 100%;
+  text-align: center;
+  z-index: 10;
+}
+
+#console-ui {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  box-sizing: border-box;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.console-section {
+  flex: 1;
+  margin: 0 10px;
+  padding: 15px;
+  background-color: rgba(30, 30, 30, 0.8);
+  border-radius: 8px;
+}
+
+.control-group {
+  margin-bottom: 15px;
+}
+
+.control-group h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #4fc3f7;
+}
+
+.console-btn {
+  background-color: #2e2e2e;
+  color: #ffffff;
+  border: none;
+  padding: 8px 12px;
+  margin: 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.console-btn:hover {
+  background-color: #444;
+}
+
+.console-btn.primary {
+  background-color: #2196f3;
+}
+
+.console-btn.primary:hover {
+  background-color: #1976d2;
+}
+
+.console-select, .slider-control input {
+  background-color: #333;
+  color: white;
+  border: 1px solid #555;
+  padding: 5px;
+  border-radius: 4px;
+  margin: 5px;
+}
+
+#performance-stats {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
 }
