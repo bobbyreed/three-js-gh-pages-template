@@ -44,8 +44,8 @@ function initScene() {
   
   // Create camera
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 5;
-  camera.position.y = -10; // Move camera down to make object appear higher
+  //camera.position.z = 5;
+  //camera.position.y = -1; // Move camera down to make object appear higher
   camera.lookAt(0, 0, 0); // Keep looking at the center
   
   // Create renderer
@@ -190,8 +190,7 @@ function changeObject(index) {
 function setupEventListeners() {
   // Debug which elements are found
   console.log("Setting up event listeners");
-
-//slider setu p
+//slider setup
   const scaleSlider = document.getElementById('scale-slider');
 const scaleValue = document.getElementById('scale-value');
 
