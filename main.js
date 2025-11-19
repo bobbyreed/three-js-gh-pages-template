@@ -44,6 +44,7 @@ let dofEnabled = false;
 let particleSystem = null;
 let physicsEnabled = false;
 let loadedModel = null;
+let loadedModels = []; // Array to store all loaded models with their names
 
 function init() {
   console.log("Initializing Three.js application...");
@@ -178,19 +179,58 @@ function createInitialObject() {
 
 function updateObjectInfoDisplay() {
   const objectNames = [
-    'Cube', 'Sphere', 'Cylinder', 'Cone', 'Torus', 
+    'Cube', 'Sphere', 'Cylinder', 'Cone', 'Torus',
     'Torus Knot', 'Dodecahedron', 'Octahedron', 'Tetrahedron', 'Icosahedron'
   ];
-  
+
   const nameElement = document.getElementById('current-object-name');
   if (nameElement) {
-    nameElement.textContent = objectNames[currentObjectIndex];
+    if (currentObjectIndex < primitives.length) {
+      // Display primitive name
+      nameElement.textContent = objectNames[currentObjectIndex];
+    } else {
+      // Display loaded model name
+      const modelIndex = currentObjectIndex - primitives.length;
+      nameElement.textContent = loadedModels[modelIndex].name;
+    }
   }
-  
+
   const objectSelect = document.getElementById('object-select');
   if (objectSelect && objectSelect.value !== currentObjectIndex.toString()) {
     objectSelect.value = currentObjectIndex.toString();
   }
+}
+
+function updateObjectDropdown() {
+  const objectSelect = document.getElementById('object-select');
+  if (!objectSelect) return;
+
+  // Clear existing options
+  objectSelect.innerHTML = '';
+
+  // Add primitive options
+  const primitiveNames = [
+    'Cube', 'Sphere', 'Cylinder', 'Cone', 'Torus',
+    'Torus Knot', 'Dodecahedron', 'Octahedron', 'Tetrahedron', 'Icosahedron'
+  ];
+
+  primitiveNames.forEach((name, index) => {
+    const option = document.createElement('option');
+    option.value = index;
+    option.textContent = name;
+    objectSelect.appendChild(option);
+  });
+
+  // Add loaded model options
+  loadedModels.forEach((modelData, index) => {
+    const option = document.createElement('option');
+    option.value = primitives.length + index;
+    option.textContent = modelData.name;
+    objectSelect.appendChild(option);
+  });
+
+  // Update selected value
+  objectSelect.value = currentObjectIndex.toString();
 }
 
 function animate() {
@@ -209,9 +249,14 @@ function animate() {
     updatePerformanceStats();
   }
 
-  // Rotate object
-  currentObject.rotation.x += 0.01;
-  currentObject.rotation.y += 0.01;
+  // Rotate visible object (primitive or loaded model)
+  if (currentObject && currentObject.visible) {
+    currentObject.rotation.x += 0.01;
+    currentObject.rotation.y += 0.01;
+  } else if (loadedModel && loadedModel.visible) {
+    loadedModel.rotation.x += 0.01;
+    loadedModel.rotation.y += 0.01;
+  }
 
   // Update controls
   controls.update();
@@ -243,22 +288,44 @@ function stopAnimation() {
 }
 
 function changeObject(index) {
-  // Remove current object
-  scene.remove(currentObject);
-  
+  const totalObjects = primitives.length + loadedModels.length;
+
   // Update index with boundary checks
   currentObjectIndex = index;
-  if (currentObjectIndex < 0) currentObjectIndex = primitives.length - 1;
-  if (currentObjectIndex >= primitives.length) currentObjectIndex = 0;
-  
-  // Create new object
-  currentObject = new THREE.Mesh(primitives[currentObjectIndex], currentMaterial);
-  scene.add(currentObject);
-  
+  if (currentObjectIndex < 0) currentObjectIndex = totalObjects - 1;
+  if (currentObjectIndex >= totalObjects) currentObjectIndex = 0;
+
+  // Hide current object or model
+  if (currentObject) {
+    currentObject.visible = false;
+  }
+  if (loadedModel) {
+    loadedModel.visible = false;
+  }
+
+  // Check if we're switching to a primitive or a loaded model
+  if (currentObjectIndex < primitives.length) {
+    // Show primitive
+    if (!currentObject || currentObject.geometry !== primitives[currentObjectIndex]) {
+      if (currentObject) {
+        scene.remove(currentObject);
+      }
+      currentObject = new THREE.Mesh(primitives[currentObjectIndex], currentMaterial);
+      scene.add(currentObject);
+    }
+    currentObject.visible = true;
+    loadedModel = null;
+    console.log(`Changed to primitive ${currentObjectIndex}`);
+  } else {
+    // Show loaded model
+    const modelIndex = currentObjectIndex - primitives.length;
+    loadedModel = loadedModels[modelIndex].model;
+    loadedModel.visible = true;
+    console.log(`Changed to loaded model: ${loadedModels[modelIndex].name}`);
+  }
+
   // Update UI
   updateObjectInfoDisplay();
-  
-  console.log(`Changed to object ${currentObjectIndex}`);
 }
 
 function setupEventListeners() {
@@ -682,9 +749,19 @@ function updatePerformanceStats() {
 
   // Update vertex count
   const verticesElement = document.querySelector('#vertices-counter span');
-  if (verticesElement && currentObject) {
-    const geometry = currentObject.geometry;
-    const vertexCount = geometry.attributes.position ? geometry.attributes.position.count : 0;
+  if (verticesElement) {
+    let vertexCount = 0;
+    if (currentObject && currentObject.visible && currentObject.geometry) {
+      const geometry = currentObject.geometry;
+      vertexCount = geometry.attributes.position ? geometry.attributes.position.count : 0;
+    } else if (loadedModel && loadedModel.visible) {
+      // Count vertices in loaded model
+      loadedModel.traverse((child) => {
+        if (child.isMesh && child.geometry && child.geometry.attributes.position) {
+          vertexCount += child.geometry.attributes.position.count;
+        }
+      });
+    }
     verticesElement.textContent = vertexCount.toLocaleString();
   }
 
@@ -925,11 +1002,18 @@ function toggleShadows() {
 function resetPosition() {
   console.log("Resetting object and camera positions");
 
-  // Reset object rotation and scale
-  if (currentObject) {
+  // Reset object rotation and scale for primitive
+  if (currentObject && currentObject.visible) {
     currentObject.rotation.set(0, 0, 0);
     currentObject.scale.set(1, 1, 1);
     currentObject.position.set(0, 0, 0);
+  }
+
+  // Reset object rotation and scale for loaded model
+  if (loadedModel && loadedModel.visible) {
+    loadedModel.rotation.set(0, 0, 0);
+    // Don't reset scale for loaded models as they're auto-scaled to fit
+    loadedModel.position.set(0, 0, 0);
   }
 
   // Reset camera position
@@ -1147,15 +1231,14 @@ function handleModelFile(event) {
     console.warn("For best results, use .glb format which embeds all resources.");
   }
 
-  // Remove previously loaded model
-  if (loadedModel) {
-    scene.remove(loadedModel);
-    loadedModel = null;
-  }
-
   // Hide the current primitive object
   if (currentObject) {
     currentObject.visible = false;
+  }
+
+  // Hide currently visible loaded model
+  if (loadedModel) {
+    loadedModel.visible = false;
   }
 
   const reader = new FileReader();
@@ -1178,7 +1261,21 @@ function handleModelFile(event) {
         loadedModel.scale.multiplyScalar(scale);
 
         scene.add(loadedModel);
-        console.log("GLTF/GLB model loaded successfully and replaced current object");
+
+        // Add to loaded models array
+        loadedModels.push({
+          name: file.name,
+          model: loadedModel
+        });
+
+        // Update dropdown with new model
+        updateObjectDropdown();
+
+        // Switch to the newly loaded model
+        currentObjectIndex = primitives.length + loadedModels.length - 1;
+        updateObjectInfoDisplay();
+
+        console.log(`GLTF/GLB model loaded successfully: ${file.name}`);
 
         // Render to show changes
         if (!isAnimating) {
@@ -1213,7 +1310,21 @@ function handleModelFile(event) {
         loadedModel.scale.multiplyScalar(scale);
 
         scene.add(loadedModel);
-        console.log("OBJ model loaded successfully and replaced current object");
+
+        // Add to loaded models array
+        loadedModels.push({
+          name: file.name,
+          model: loadedModel
+        });
+
+        // Update dropdown with new model
+        updateObjectDropdown();
+
+        // Switch to the newly loaded model
+        currentObjectIndex = primitives.length + loadedModels.length - 1;
+        updateObjectInfoDisplay();
+
+        console.log(`OBJ model loaded successfully: ${file.name}`);
 
         // Render to show changes
         if (!isAnimating) {
