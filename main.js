@@ -1138,14 +1138,25 @@ function handleModelFile(event) {
 
   console.log(`Loading model: ${file.name}`);
 
+  // Get file extension before creating reader
+  const extension = file.name.split('.').pop().toLowerCase();
+
+  // Warn about GLTF files
+  if (extension === 'gltf') {
+    console.warn("Warning: .gltf files may fail if they reference external resources (textures, .bin files).");
+    console.warn("For best results, use .glb format which embeds all resources.");
+  }
+
   // Remove previously loaded model
   if (loadedModel) {
     scene.remove(loadedModel);
     loadedModel = null;
   }
 
-  // Get file extension before creating reader
-  const extension = file.name.split('.').pop().toLowerCase();
+  // Hide the current primitive object
+  if (currentObject) {
+    currentObject.visible = false;
+  }
 
   const reader = new FileReader();
   reader.onload = function(e) {
@@ -1155,9 +1166,19 @@ function handleModelFile(event) {
       const loader = new GLTFLoader();
       loader.parse(contents, '', (gltf) => {
         loadedModel = gltf.scene;
-        loadedModel.position.set(3, 0, 0); // Position to the side of main object
+
+        // Center the model at origin
+        loadedModel.position.set(0, 0, 0);
+
+        // Scale model to fit in view (optional)
+        const box = new THREE.Box3().setFromObject(loadedModel);
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 2 / maxDim; // Scale to fit roughly 2 units
+        loadedModel.scale.multiplyScalar(scale);
+
         scene.add(loadedModel);
-        console.log("GLTF model loaded successfully");
+        console.log("GLTF/GLB model loaded successfully and replaced current object");
 
         // Render to show changes
         if (!isAnimating) {
@@ -1168,15 +1189,31 @@ function handleModelFile(event) {
           }
         }
       }, (error) => {
-        console.error("Error loading GLTF model:", error);
+        console.error("Error loading GLTF/GLB model:", error);
+        console.error("If using .gltf format, try using .glb instead (self-contained format)");
+
+        // Restore the primitive object on error
+        if (currentObject) {
+          currentObject.visible = true;
+        }
       });
     } else if (extension === 'obj') {
       const loader = new OBJLoader();
       try {
         loadedModel = loader.parse(contents);
-        loadedModel.position.set(3, 0, 0); // Position to the side of main object
+
+        // Center the model at origin
+        loadedModel.position.set(0, 0, 0);
+
+        // Scale model to fit in view
+        const box = new THREE.Box3().setFromObject(loadedModel);
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 2 / maxDim;
+        loadedModel.scale.multiplyScalar(scale);
+
         scene.add(loadedModel);
-        console.log("OBJ model loaded successfully");
+        console.log("OBJ model loaded successfully and replaced current object");
 
         // Render to show changes
         if (!isAnimating) {
@@ -1188,9 +1225,19 @@ function handleModelFile(event) {
         }
       } catch (error) {
         console.error("Error loading OBJ model:", error);
+
+        // Restore the primitive object on error
+        if (currentObject) {
+          currentObject.visible = true;
+        }
       }
     } else {
-      console.error("Unsupported file format");
+      console.error("Unsupported file format. Supported formats: .glb (recommended), .gltf, .obj");
+
+      // Restore the primitive object
+      if (currentObject) {
+        currentObject.visible = true;
+      }
     }
   };
 
