@@ -1144,10 +1144,12 @@ function handleModelFile(event) {
     loadedModel = null;
   }
 
+  // Get file extension before creating reader
+  const extension = file.name.split('.').pop().toLowerCase();
+
   const reader = new FileReader();
   reader.onload = function(e) {
     const contents = e.target.result;
-    const extension = file.name.split('.').pop().toLowerCase();
 
     if (extension === 'gltf' || extension === 'glb') {
       const loader = new GLTFLoader();
