@@ -45,6 +45,7 @@ let particleSystem = null;
 let physicsEnabled = false;
 let loadedModel = null;
 let loadedModels = []; // Array to store all loaded models with their names
+let parallaxObjects = []; // Array to store background parallax objects
 
 function init() {
   console.log("Initializing Three.js application...");
@@ -57,7 +58,10 @@ function init() {
   
   // Create the initial object
   createInitialObject();
-  
+
+  // Create parallax background objects
+  createParallaxBackground();
+
   // Set up event listeners for UI controls
   setupEventListeners();
   
@@ -177,6 +181,57 @@ function createInitialObject() {
   console.log("Created initial object");
 }
 
+function createParallaxBackground() {
+  // Create 2D shapes at different depths for parallax effect
+  const shapes = [];
+  const shapeCount = 15;
+
+  for (let i = 0; i < shapeCount; i++) {
+    let geometry;
+    const shapeType = Math.floor(Math.random() * 4);
+
+    // Create different 2D shapes
+    switch (shapeType) {
+      case 0: // Circle
+        geometry = new THREE.CircleGeometry(0.3 + Math.random() * 0.5, 32);
+        break;
+      case 1: // Square
+        geometry = new THREE.PlaneGeometry(0.5 + Math.random() * 0.8, 0.5 + Math.random() * 0.8);
+        break;
+      case 2: // Triangle
+        geometry = new THREE.CircleGeometry(0.4 + Math.random() * 0.6, 3);
+        break;
+      case 3: // Hexagon
+        geometry = new THREE.CircleGeometry(0.3 + Math.random() * 0.5, 6);
+        break;
+    }
+
+    // Create semi-transparent material with random color
+    const material = new THREE.MeshBasicMaterial({
+      color: new THREE.Color(Math.random(), Math.random(), Math.random()),
+      transparent: true,
+      opacity: 0.15 + Math.random() * 0.15,
+      side: THREE.DoubleSide
+    });
+
+    const mesh = new THREE.Mesh(geometry, material);
+
+    // Position shapes in background at different depths
+    mesh.position.x = (Math.random() - 0.5) * 20;
+    mesh.position.y = (Math.random() - 0.5) * 20;
+    mesh.position.z = -10 - Math.random() * 20; // Behind the main object
+
+    // Store initial position for parallax calculation
+    mesh.userData.initialPosition = mesh.position.clone();
+    mesh.userData.parallaxFactor = 0.02 + Math.random() * 0.03;
+
+    scene.add(mesh);
+    parallaxObjects.push(mesh);
+  }
+
+  console.log(`Created ${shapeCount} parallax background objects`);
+}
+
 function updateObjectInfoDisplay() {
   const objectNames = [
     'Cube', 'Sphere', 'Cylinder', 'Cone', 'Torus',
@@ -258,6 +313,15 @@ function animate() {
       loadedModel.rotation.y += 0.01;
     }
   }
+
+  // Update parallax background objects
+  parallaxObjects.forEach((obj) => {
+    // Move shapes based on camera position for parallax effect
+    const offsetX = (camera.position.x - 0) * obj.userData.parallaxFactor;
+    const offsetY = (camera.position.y + 2) * obj.userData.parallaxFactor; // +2 is default camera Y
+    obj.position.x = obj.userData.initialPosition.x - offsetX;
+    obj.position.y = obj.userData.initialPosition.y - offsetY;
+  });
 
   // Always update controls (so user can interact even when animation is paused)
   controls.update();
