@@ -533,6 +533,13 @@ if (scaleSlider && scaleValue) {
     console.log("Physics toggle button listener attached");
   }
 
+  // Toggle controls button
+  const toggleControlsButton = document.getElementById('toggle-controls-btn');
+  if (toggleControlsButton) {
+    toggleControlsButton.addEventListener('click', toggleControlsVisibility);
+    console.log("Toggle controls button listener attached");
+  }
+
   // Log all buttons to help diagnose issues
   const buttons = document.querySelectorAll('button');
   console.log(`Found ${buttons.length} buttons in the document`);
@@ -1228,5 +1235,34 @@ function togglePhysics() {
         }
       }
     }, 16); // ~60 FPS
+  }
+}
+
+function toggleControlsVisibility() {
+  const consoleUI = document.getElementById('console-ui');
+  const techPanel = document.getElementById('tech-panel');
+  const scenePanel = document.getElementById('scene-panel');
+  const infoPanel = document.getElementById('info-panel');
+  const toggleButton = document.getElementById('toggle-controls-btn');
+
+  // Toggle visibility of all control panels
+  const isHidden = consoleUI.style.display === 'none';
+
+  if (isHidden) {
+    // Show controls
+    consoleUI.style.display = 'flex';
+    if (techPanel) techPanel.style.display = 'block';
+    if (scenePanel) scenePanel.style.display = 'block';
+    if (infoPanel) infoPanel.style.display = 'block';
+    toggleButton.textContent = 'Hide Controls';
+    console.log("Controls shown");
+  } else {
+    // Hide controls
+    consoleUI.style.display = 'none';
+    if (techPanel) techPanel.style.display = 'none';
+    if (scenePanel) scenePanel.style.display = 'none';
+    if (infoPanel) infoPanel.style.display = 'none';
+    toggleButton.textContent = 'Show Controls';
+    console.log("Controls hidden");
   }
 }

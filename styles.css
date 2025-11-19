@@ -134,3 +134,32 @@ body {
 .scene-btn:hover {
   background-color: #2c5282;
 }
+
+/* Toggle Controls Button */
+.toggle-controls-btn {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(33, 150, 243, 0.9);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 15px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-controls-btn:hover {
+  background-color: rgba(25, 118, 210, 0.95);
+  transform: translate(-50%, -50%) scale(1.05);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+}
+
+.toggle-controls-btn:active {
+  transform: translate(-50%, -50%) scale(0.98);
+}
