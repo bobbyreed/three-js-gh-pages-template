@@ -181,10 +181,59 @@ function createInitialObject() {
   console.log("Created initial object");
 }
 
-function createParallaxBackground() {
+function createParallaxBackground(theme = 'default') {
+  // Remove existing parallax objects
+  parallaxObjects.forEach(obj => {
+    scene.remove(obj);
+  });
+  parallaxObjects = [];
+
   // Create 2D shapes at different depths for parallax effect
-  const shapes = [];
-  const shapeCount = 15;
+  const shapeCount = 20;
+
+  // Theme-specific colors
+  let colorPalette;
+  switch (theme) {
+    case 'space':
+      // Deep space: blues, purples, whites
+      colorPalette = [
+        new THREE.Color(0x1a1a3f),
+        new THREE.Color(0x88aaff),
+        new THREE.Color(0x4a5fff),
+        new THREE.Color(0xffffff),
+        new THREE.Color(0x9999ff)
+      ];
+      break;
+    case 'planet':
+      // Alien planet: purples, greens, magentas
+      colorPalette = [
+        new THREE.Color(0x663366),
+        new THREE.Color(0x88ff88),
+        new THREE.Color(0xff66ff),
+        new THREE.Color(0x44ff44),
+        new THREE.Color(0xaa44aa)
+      ];
+      break;
+    case 'tech':
+      // Tech lab: cyans, whites, blues
+      colorPalette = [
+        new THREE.Color(0x4fc3f7),
+        new THREE.Color(0xffffff),
+        new THREE.Color(0x00bcd4),
+        new THREE.Color(0x81d4fa),
+        new THREE.Color(0xb3e5fc)
+      ];
+      break;
+    default:
+      // Default: random colors
+      colorPalette = [
+        new THREE.Color(Math.random(), Math.random(), Math.random()),
+        new THREE.Color(Math.random(), Math.random(), Math.random()),
+        new THREE.Color(Math.random(), Math.random(), Math.random()),
+        new THREE.Color(Math.random(), Math.random(), Math.random()),
+        new THREE.Color(Math.random(), Math.random(), Math.random())
+      ];
+  }
 
   for (let i = 0; i < shapeCount; i++) {
     let geometry;
@@ -206,9 +255,12 @@ function createParallaxBackground() {
         break;
     }
 
-    // Create semi-transparent material with random color
+    // Pick a color from the theme palette
+    const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+
+    // Create semi-transparent material with themed color
     const material = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(Math.random(), Math.random(), Math.random()),
+      color: color,
       transparent: true,
       opacity: 0.15 + Math.random() * 0.15,
       side: THREE.DoubleSide
@@ -216,10 +268,19 @@ function createParallaxBackground() {
 
     const mesh = new THREE.Mesh(geometry, material);
 
-    // Position shapes in background at different depths
-    mesh.position.x = (Math.random() - 0.5) * 20;
-    mesh.position.y = (Math.random() - 0.5) * 20;
-    mesh.position.z = -10 - Math.random() * 20; // Behind the main object
+    // Position shapes in a spherical distribution around the origin
+    // Use spherical coordinates for even distribution
+    const radius = 15 + Math.random() * 15; // Distance from center (15-30 units)
+    const theta = Math.random() * Math.PI * 2; // Horizontal angle (0 to 360 degrees)
+    const phi = Math.random() * Math.PI; // Vertical angle (0 to 180 degrees)
+
+    // Convert spherical to Cartesian coordinates
+    mesh.position.x = radius * Math.sin(phi) * Math.cos(theta);
+    mesh.position.y = radius * Math.sin(phi) * Math.sin(theta);
+    mesh.position.z = radius * Math.cos(phi);
+
+    // Make the shape face the center (look at origin)
+    mesh.lookAt(0, 0, 0);
 
     // Store initial position for parallax calculation
     mesh.userData.initialPosition = mesh.position.clone();
@@ -229,7 +290,7 @@ function createParallaxBackground() {
     parallaxObjects.push(mesh);
   }
 
-  console.log(`Created ${shapeCount} parallax background objects`);
+  console.log(`Created ${shapeCount} parallax background objects (theme: ${theme})`);
 }
 
 function updateObjectInfoDisplay() {
@@ -877,6 +938,9 @@ function setEnvironmentPreset(preset) {
       scene.fog = null;
       break;
   }
+
+  // Regenerate parallax background with environment-specific theme
+  createParallaxBackground(preset);
 
   // Render to show changes if not animating
   if (!isAnimating) {
