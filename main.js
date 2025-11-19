@@ -63,10 +63,10 @@ function init() {
   
   // Initial render
   renderer.render(scene, camera);
-  
-  // Start animation by default
-  startAnimation();
-  
+
+  // Start render loop (controls will work even when animation is paused)
+  animate();
+
   console.log("Initialization complete");
 }
 
@@ -234,8 +234,6 @@ function updateObjectDropdown() {
 }
 
 function animate() {
-  if (!isAnimating) return;
-
   // Calculate FPS
   const currentTime = performance.now();
   frameCount++;
@@ -249,19 +247,22 @@ function animate() {
     updatePerformanceStats();
   }
 
-  // Rotate visible object (primitive or loaded model)
-  if (currentObject && currentObject.visible) {
-    currentObject.rotation.x += 0.01;
-    currentObject.rotation.y += 0.01;
-  } else if (loadedModel && loadedModel.visible) {
-    loadedModel.rotation.x += 0.01;
-    loadedModel.rotation.y += 0.01;
+  // Only rotate objects if animation is enabled
+  if (isAnimating) {
+    // Rotate visible object (primitive or loaded model)
+    if (currentObject && currentObject.visible) {
+      currentObject.rotation.x += 0.01;
+      currentObject.rotation.y += 0.01;
+    } else if (loadedModel && loadedModel.visible) {
+      loadedModel.rotation.x += 0.01;
+      loadedModel.rotation.y += 0.01;
+    }
   }
 
-  // Update controls
+  // Always update controls (so user can interact even when animation is paused)
   controls.update();
 
-  // Render scene (use composer if effects are enabled)
+  // Always render scene (use composer if effects are enabled)
   if (bloomEnabled || dofEnabled) {
     composer.render();
   } else {
@@ -275,16 +276,11 @@ function animate() {
 function startAnimation() {
   console.log("Starting animation");
   isAnimating = true;
-  animate();
 }
 
 function stopAnimation() {
   console.log("Stopping animation");
   isAnimating = false;
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId);
-    animationFrameId = null;
-  }
 }
 
 function changeObject(index) {
